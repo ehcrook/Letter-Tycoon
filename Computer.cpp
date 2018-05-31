@@ -20,8 +20,8 @@ string Computer::play(Hand hand, Hand shared) {
 
     string letters = hand.getLetters() + shared.getLetters();
     
-    for(int length=8; length != 2; length--) {
-        string word = tryWords(letters, length, 1000);
+    for(int length=10; length != 2; length--) {
+        string word = tryWords(letters, length, 10000);
         if (word!="D") return word;
     }
     

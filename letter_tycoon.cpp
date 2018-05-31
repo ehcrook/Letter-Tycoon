@@ -148,7 +148,8 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
             if (cards.getHand(player).getSize()>0) {
                 cout << "Discard any of these letters [" << cards.getHand(player).output() << "]? Enter without spaces. Type P to pass." << endl;
                 discards = strategy.discard(cards.getHand(player));
-            
+                cout << "Player discards [" << discards << "]" << endl;
+
                 if(discards == "P") break;
                 
                 try {
@@ -176,7 +177,7 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
     {
         char letter = str[i];
         Player owner = patents.getPatentHolder(letter);
-        if (!(player==owner)) {
+        if (!(player==owner||owner.getName()=="nobody")) {
             owner.add_money(1);
             cout << "You used the letter " << letter << " so " << owner.getName() << " earned $1" << endl;
         }
@@ -261,6 +262,8 @@ int main()
     
     cards.setup(players);
     
+    random_shuffle(players.begin(), players.end());
+
     // play
     bool finished = false;
     

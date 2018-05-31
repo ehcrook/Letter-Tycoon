@@ -30,12 +30,12 @@ bool Dictionary::check(string word) {
     
     if(itr != dictionary.end()) return true;
     
-    if(word[word.size()-1] == 's')
-    {
-        string sub = word.substr(0,word.size()-1);
-        itr = dictionary.find(sub);
-        if(itr != dictionary.end()) return true;        
-    }
+//    if(word[word.size()-1] == 's')
+//    {
+//        string sub = word.substr(0,word.size()-1);
+//        itr = dictionary.find(sub);
+//        if(itr != dictionary.end()) return true;        
+//    }
         
     return false;
 
