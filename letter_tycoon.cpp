@@ -195,10 +195,12 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
         
         if(patent.letter != 'P')
         {   
+            // checking that they entered a valid letter
             Card c(patent.letter, 0);
             bool valid_purchase = false;
             for(unsigned int i = 0; i < buyable.size(); i++)
-                if(buyable[i] == c) valid_purchase = false;
+                if(buyable[i] == c) valid_purchase = true;
+
             if(!valid_purchase)
                 cout << "That letter wasn't an option! You forfeit your chance to buy." << endl;
             else
