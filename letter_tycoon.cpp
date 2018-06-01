@@ -18,10 +18,9 @@
 #include "Computer.h"
 
 #define DEBUG_
-
 using namespace std;
 
-void update_score(Player& player, Patents patents, const string word) {
+static void update_score(Player& player, Patents patents, const string word) {
     
     int q = 1;
     if(word.find('q',0) < word.size())
@@ -78,8 +77,7 @@ void update_score(Player& player, Patents patents, const string word) {
 
 }
 
-
-void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictionary, Patents& patents)
+static void turn(Player player, Strategy& strategy, Cards& cards, Dictionary& dictionary, Patents& patents)
 {
 
     cout << player.getName() << "'s turn!" << endl;
@@ -195,6 +193,7 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
         
         if(patent.letter != 'P')
         {   
+
             // checking that they entered a valid letter
             Card c(patent.letter, 0);
             bool valid_purchase = false;
@@ -205,10 +204,11 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
                 cout << "That letter wasn't an option! You forfeit your chance to buy." << endl;
             else
             {
+
                 try {
-                patents.buyPatent(player, patent);
-                cout << "Purchased!" << endl;
-                cout << "You now have $" << player.get_money() << " and " << player.get_stocks() << " stocks" << endl;
+                    patents.buyPatent(player, patent);
+                    cout << "Purchased!" << endl;
+                    cout << "You now have $" << player.get_money() << " and " << player.get_stocks() << " stocks" << endl;
                 }
                 catch (char c) {
                     cout << c << " is not available for purchase." << endl;
@@ -218,14 +218,76 @@ void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictiona
     }
     else
         cout << "You cannot purchase any patents at this time." << endl;
+}
+
+static vector<Player> setupPlayers(Dictionary &dictionary, map<Player, Strategy *> &strategies) {
     
+    set<Player> players;
+    
+    // set up the players
+    int playerCount = 0;
+    do {
+        string p;
+        cout << "Enter number of players to play this game (2 to 6)." << endl;
+        cin >> p;
+        if (p=="") {
+            playerCount = 2;
+        }
+        else {
+            try {
+                playerCount = stoi(p);
+            } catch (...) {
+                cout << "Invalid entry (" << p << "). Please try again" << endl;
+            }
+        }
+    } while (playerCount < 2 || playerCount > 6);
+    
+    bool ok;
+    for (int i=0; i<playerCount; i++) {
+        
+        string str;
+        Player* player;
+        Strategy* strategy;
+
+        do {
+            
+            cout << "Enter player (#" << (i+1) << ")'s name. Use '!' for a computer player. > ";
+            cin >> str;
+            
+            if (str[0] == '!') {
+                string name = str.substr(1);
+                player = new Player(name + " (computer)");
+                strategy = new Computer(dictionary);
+            }
+            else if (str[0] == '@') {
+                string name = str.substr(1);
+                player = new Player(name + " (cheater)");
+                strategy = new Cheater(dictionary);
+            }
+            else {
+                player = new Player(str);
+                strategy = new Human(dictionary);
+            }
+            
+            pair<set<Player>::iterator,bool> itr = players.insert(*player);
+            ok = itr.second;
+            if (!ok) {
+                cout << "Player with the same name exist already. Please provide a different name." << endl;
+            }
+        }
+        while (!ok);
+        
+        strategies[*player] = strategy;
+        
+    }
+    
+    return vector<Player>(players.begin(),players.end());
 }
 
 int main()
 {
-
     // set stuff up
-	Dictionary dictionary;
+	  Dictionary dictionary;
     dictionary.load("dictionary.txt");
     cout << "Dictionary Loaded with " << dictionary.getSize() << " Words." << endl;
 
@@ -238,38 +300,9 @@ int main()
     cout << "Patents Loaded with " << patents.getAvailable().size() << " Patents." << endl;
 
     vector<Player> players;
-    map<Player, Strategy*> strategies;
-
-    // set up the players
-    int playerCount = 2;
+    map<Player, Strategy *> strategies;
     
-    for (int i=0; i<playerCount; i++) {
-        string str;
-        cout << "Enter player's name: ";
-        cin >> str;
-        
-        Player* player;
-        Strategy* strategy;
-        
-        if (str[0] == '!') {
-            string name = str.substr(1);
-            player = new Player(name + " (computer)");
-            strategy = new Computer(dictionary);
-        }
-        else if (str[0] == '@') {
-            string name = str.substr(1);
-            player = new Player(name + " (cheater)");
-            strategy = new Cheater(dictionary);
-        }
-        else {
-            player = new Player(str);
-            strategy = new Human(dictionary);
-        }
-
-        players.push_back(*player);
-        strategies[*player] = strategy;
-        
-    }
+    players = setupPlayers(dictionary, strategies);
     
     cards.setup(players);
     
