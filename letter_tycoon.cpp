@@ -77,7 +77,7 @@ static void update_score(Player& player, Patents patents, const string word) {
 
 }
 
-static void turn(Player player, Strategy& strategy, Cards& cards, Dictionary& dictionary, Patents& patents)
+static void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictionary, Patents& patents)
 {
 
     cout << player.getName() << "'s turn!" << endl;
