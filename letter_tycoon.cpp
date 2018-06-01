@@ -18,7 +18,6 @@
 #include "Computer.h"
 
 #define DEBUG_
-
 using namespace std;
 
 static void update_score(Player& player, Patents patents, const string word) {
@@ -194,20 +193,28 @@ static void turn(Player player, Strategy& strategy, Cards& cards, Dictionary& di
         Card patent = strategy.buyPatent(buyable);
         
         if(patent.letter != 'P')
-        {
-            try {
+        {   
+            Card c(patent.letter, 0);
+            bool valid_purchase = false;
+            for(unsigned int i = 0; i < buyable.size(); i++)
+                if(buyable[i] == c) valid_purchase = false;
+            if(!valid_purchase)
+                cout << "That letter wasn't an option! You forfeit your chance to buy." << endl;
+            else
+            {
+                 try {
                 patents.buyPatent(player, patent);
                 cout << "Purchased!" << endl;
                 cout << "You now have $" << player.get_money() << " and " << player.get_stocks() << " stocks" << endl;
-            }
-            catch (char c) {
-                cout << c << " is not available for purchase." << endl;
+                }
+                catch (char c) {
+                    cout << c << " is not available for purchase." << endl;
+                }
             }
         }
     }
     else
         cout << "You cannot purchase any patents at this time." << endl;
-    
 }
 
 static vector<Player> setupPlayers(Dictionary &dictionary, map<Player, Strategy *> &strategies) {
