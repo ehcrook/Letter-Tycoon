@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <map>
+#include <vector>
 
 //#ifdef DEBUG_
 #include <iostream>
