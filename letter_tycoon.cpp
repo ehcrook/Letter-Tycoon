@@ -16,6 +16,7 @@
 #include "Human.h"
 #include "Cheater.h"
 #include "Computer.h"
+#include "EmilyComputer.h"
 
 #define DEBUG_
 using namespace std;
@@ -263,6 +264,11 @@ static vector<Player> setupPlayers(Dictionary &dictionary, map<Player, Strategy 
                 string name = str.substr(1);
                 player = new Player(name + " (cheater)");
                 strategy = new Cheater(dictionary);
+            }
+            else if (str[0] == '?') {
+                string name = str.substr(1);
+                player = new Player(name + " (average computer)");
+                strategy = new EmilyComputer(dictionary);
             }
             else {
                 player = new Player(str);
