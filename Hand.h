@@ -12,7 +12,8 @@
 //#include <stdio.h>
 
 #include <vector>
-//#include <iostream>
+#include <iostream>
+#include <algorithm>
 //#include <map>
 
 #include "Card.h"

@@ -26,11 +26,16 @@ string EmilyComputer::play(Hand hand, Hand shared) {
     
     if(playable.size() == 0) return "D";
 
-    int num = rand()%playable.size();
     set<string>::iterator itr = playable.begin();
 
+    int best = rand()%10;
+    int num = rand()%playable.size();
+
     for(int i = 0; i < num; i++)
+    {
+        if(best && (*itr).size() > 4) return *itr;
     	itr++;
+    }
 
     return *itr;
 }
