@@ -9,7 +9,7 @@
 #ifndef Human_h
 #define Human_h
 
-#include "Card.h"
+#include "Patent.h"
 #include "Hand.h"
 #include "Strategy.h"
 #include "Dictionary.h"
@@ -20,10 +20,11 @@ class Human : public Strategy {
 public:
     Human(Dictionary &d) : Strategy(d) {}
 //    string getName() { return Strategy::getName(); }
-    string play(Hand hand, Hand shared);
+    string play(Hand hand, Hand shared, vector<Patent> patents);
     string discard(Hand hand);
-    Card buyPatent(vector<Card> patents);
-    static const Card PASS;
+    char replace(Hand hand);
+    Patent buyPatent(vector<Patent> patents);
+    static const Patent PASS;
 };
 
 #endif /* Human_h */

@@ -145,6 +145,15 @@ void Cards::discard(Player player, string word)
 
 }
 
+void Cards::replace(Player player, char letter)
+{
+    Hand *hand = hands[player];
+    Card card = hand->getCard(letter);
+    hand->remove(card);
+    deck.discard(card);
+    
+}
+
 Hand Cards::getHand(Player player) {
     
     map<Player, Hand*>::iterator itr = hands.begin();

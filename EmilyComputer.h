@@ -3,7 +3,7 @@
 #ifndef _EMILYCOMPUTER_H_
 #define _EMILYCOMPUTER_H_
 
-#include "Card.h"
+#include "Patent.h"
 #include "Hand.h"
 #include "Strategy.h"
 #include "Dictionary.h"
@@ -13,9 +13,10 @@ class EmilyComputer: public Strategy
 {
 public:
     EmilyComputer(Dictionary &d) : Strategy(d) {}
-    string play(Hand hand, Hand shared);
+    string play(Hand hand, Hand shared, vector<Patent> patents);
     string discard(Hand hand);
-    Card buyPatent(vector<Card> patents);    
+    char replace(Hand hand);
+    Patent buyPatent(vector<Patent> patents);
 private:
     void tryWords(set<string>& playable, string letters, int length, int attempts);
 

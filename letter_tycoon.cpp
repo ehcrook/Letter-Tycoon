@@ -10,7 +10,9 @@
 #include "Card.h"
 #include "Cards.h"
 #include "Player.h"
+#include "Patent.h"
 #include "Patents.h"
+#include "Score.h"
 #include "Hand.h"
 #include "Strategy.h"
 #include "Human.h"
@@ -21,61 +23,45 @@
 #define DEBUG_
 using namespace std;
 
-static void update_score(Player& player, Patents patents, const string word) {
+static void playWord(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictionary, string word) {
     
-    int q = 1;
-    if(word.find('q',0) < word.size())
-    {
-        q = 2;
-        cout << "You used the q and received x2 score!" << endl;
-    }
-    
-    // special abilities
-    int b = 1;
-    Card B('b', 2);
-    if(patents.isPatentHolder(player,'b'))
-    {
-        if(Card::isVowel(word[0]) && Card::isVowel(word[word.size()-1]))
-        {
-            b = 2;
-            cout << "You used your b ability and received x2 score!" << endl;
-        }
-    }
-    
-    int j = 1;
-    Card J('j', 2);
-    if(patents.isPatentHolder(player,'j'))
-    {
-        int count = 0;
-        for(unsigned int i = 0; i < word.size(); i++)
-        if(Card::isVowel(word[i])) count++;
-        if(count >= word.size()/2)
-        {
-            j = 2;
-            cout << "You used your j ability and received x2 score!" << endl;
-        }
-    }
-    
-    int k = 1;
-    Card K('k',2);
-    if(patents.isPatentHolder(player,'k'))
-    {
-        int count = 0;
-        for(unsigned int i = 0; i < word.size(); i++)
-        if(Card::isVowel(word[i])) count++;
-        if(count == 1)
-        {
-            k = 2;
-            cout << "You used your k ability and received x2 score!" << endl;
-        }
-    }
+    cout << player.getName() << " played '" << word << "'" << endl;
 
-    int multiplier = b*j*k*q;
-    if(word.size() < 7) player.add_money(multiplier*((int)word.size()-2));
-    if(word.size() >= 6) player.add_stocks(multiplier);
-    if(word.size() >= 7) player.add_money(multiplier*6);
-    if(word.size() > 7) player.add_stocks(multiplier*((int)word.size()-7));
+    if (!dictionary.check(word)) {
+        cout << "Your word is not valid. Lose one coin. Your turn is over." << endl;
+        player.remove_money(1);
+        return;
+    }
+    
+    try
+    {
+        cards.checkWord(player, word);
+    }
+    catch(char c)
+    {
+        cout << "You do not have enough of the letter " << c << " to play this word. Lose one coin. Your turn is over." << endl;
+        player.remove_money(1);
+        return;
+    }
+    
+    cards.play(player, word);
 
+    string discards;
+    if (cards.getHand(player).getSize()>0) {
+        cout << "Discard any of these letters [" << cards.getHand(player).output() << "]? Enter without spaces. Type P to pass." << endl;
+        discards = strategy.discard(cards.getHand(player));
+        cout << "Player discards [" << discards << "]" << endl;
+        
+        if(discards == "P") return;
+        
+        try {
+            cards.discard(player, discards);
+        }
+        catch (char c) {
+            cout << "You do not have the letter " << c << " in your hand." << endl;
+        }
+    }
+    
 }
 
 static void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& dictionary, Patents& patents)
@@ -90,74 +76,55 @@ static void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& d
     
     cout << "In your hand: [" << cards.getHand(player).output() << "]" << endl;
 
+    bool played = false;
+    bool replaced = false;
     string str = "S";
     string discards = "";
     
-    while(str == "S")
+    while(!played)
     {
 
-        cout << "Play a word! Say 'S' to rearrange your hand. Say 'D' to swap out cards and end your turn." << endl;
-        str = strategy.play(cards.getHand(player), shared);
+        cout << "Enter 'S' to rearrange your hand." << endl;
+        cout << "Enter 'D' to swap out cards and end your turn." << endl;
+        
+        // player with q may discard 1 card at beginning of their turn
+        if (!replaced && patents.isPatentHolder(player, 'q')) {
+            cout << "Enter 'Q' to replace one card from your hand." << endl;
+        }
+        cout << "Play a Word! " << endl;
+        
+        str = strategy.play(cards.getHand(player), shared, patents.getPatents(player));
         
         cout << "Player enters [" << str << "]" << endl;
-        if(str == "D")
-        {
-            cout << "Which letters would you like to discard?" << endl;
-            discards = strategy.discard(cards.getHand(player));
-            cards.discard(player, discards);
-        }
-        else if(str == "S")
-        {
-            Hand hand = cards.getHand(player);
-            hand.shuffle();
-            cout << "In your hand: [" << hand.output() << "]" << endl;
-        }
-        else
-        {
-            if (!dictionary.check(str)) {
-                cout << "Your word is not valid. Lose one coin. Your turn is over." << endl;
-                player.remove_money(1);
-                return;
-            }
-            else {
-                cout << player.getName() << " played '" << str << "'" << endl;
-            }
-            
-            try
+        switch (str[0]) {
+            case 'D':
             {
-                cards.checkWord(player, str);
-            }
-            catch(char c)
-            {
-                cout << "You do not have enough of the letter " << c << " to play this word. Lose one coin. Your turn is over." << endl;
-                player.remove_money(1);
-                return;
-            }
-            
-            if (dictionary.check(str)) {
-                // play the word
-                cards.play(player, str);
-            }
-            else {
-                cout << "Your word is not valid. Lose one coin. Your turn is over." << endl;
-                player.remove_money(1);
-                return;
-            }
-            
-            if (cards.getHand(player).getSize()>0) {
-                cout << "Discard any of these letters [" << cards.getHand(player).output() << "]? Enter without spaces. Type P to pass." << endl;
+                cout << "Which letters would you like to discard?" << endl;
                 discards = strategy.discard(cards.getHand(player));
-                cout << "Player discards [" << discards << "]" << endl;
-
-                if(discards == "P") break;
-                
-                try {
-                    cards.discard(player, discards);
-                }
-                catch (char c) {
-                    cout << "You do not have the letter " << c << " in your hand." << endl;
-                }
+                cards.discard(player, discards);
+                played = true;
+                break;
             }
+            case 'S':
+            {
+                Hand hand = cards.getHand(player);
+                hand.shuffle();
+                cout << "In your hand: [" << hand.output() << "]" << endl;
+                break;
+            }
+            case 'Q':
+            {
+                if (!replaced) {
+                    cout << "Which letter would you like to discard? " << endl;
+                    discards = strategy.discard(cards.getHand(player));
+                    cards.replace(player, discards[0]);
+                    replaced = true;
+                }
+                break;
+            }
+            default:
+                playWord(player, strategy, cards, dictionary, str);
+                played = true;
         }
         
     }
@@ -165,9 +132,24 @@ static void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& d
     cards.endTurn(player);
     
     if (str == "D") return;
-        
-    update_score(player, patents, str);
     
+    // update scores
+    Score score = dictionary.score(str, patents.getPatents(player));
+    
+    vector<Patent> used = score.getPatentsUsed();
+    vector<Patent>::iterator itr = used.begin();
+    for (;itr!=used.end();itr++) {
+        cout << "You used your " << itr->getLetter() << " ability and received x2 score!" << endl;
+    }
+
+    if (score.usedQ()) {
+        cout << "Your word contains Q. You have received x2 score!" << endl;
+    }
+
+    cout << "Your word scored $" << score.getCash() << " and " << score.getStocks() << "." << endl;
+    player.add_money(score.getCash());
+    player.add_stocks(score.getStocks());
+                     
     cout << "You now have $" << player.get_money() << " and " << player.get_stocks() << " stocks" << endl;
     cout << "In your hand: [" << cards.getHand(player).output() << "]" << endl;
 
@@ -183,23 +165,22 @@ static void turn(Player& player, Strategy& strategy, Cards& cards, Dictionary& d
     }
 
     // see if player wants to buy any patents
-    vector<Card> buyable = patents.getBuyable(str, player.get_money());
+    vector<Patent> buyable = patents.getBuyable(str, player.get_money());
     if(buyable.size() > 0)
     {
         for(unsigned int i = 0; i < buyable.size(); i++)
-        cout << buyable[i].letter << "($" << buyable[i].price << ") ";
+        cout << buyable[i].getLetter() << "($" << buyable[i].getPrice() << ") ";
         
         cout << endl << "Enter a letter to buy. Enter P to continue without buying." << endl;
-        Card patent = strategy.buyPatent(buyable);
+        Patent patent = strategy.buyPatent(buyable);
         
-        if(patent.letter != 'P')
+        if(patent.getLetter() != 'P')
         {   
 
             // checking that they entered a valid letter
-            Card c(patent.letter, 0);
             bool valid_purchase = false;
             for(unsigned int i = 0; i < buyable.size(); i++)
-                if(buyable[i] == c) valid_purchase = true;
+                if(buyable[i].getLetter()==patent.getLetter()) valid_purchase = true;
 
             if(!valid_purchase)
                 cout << "That letter wasn't an option! You forfeit your chance to buy." << endl;
@@ -295,10 +276,18 @@ int main()
     // set stuff up
 	  Dictionary dictionary;
     dictionary.load("dictionary.txt");
+    if (dictionary.getSize()==0) {
+        cout << "Could not load Dictionary." << endl;
+        return -1;
+    }
     cout << "Dictionary Loaded with " << dictionary.getSize() << " Words." << endl;
 
     Cards cards;
     cards.load("cards.txt");
+    if (cards.getDeckSize()==0) {
+        cout << "Could not load Deck." << endl;
+        return -1;
+    }
     cout << "Deck Loaded with " << cards.getDeckSize() << " Cards." << endl;
     
     Patents patents;
@@ -324,11 +313,11 @@ int main()
 
         {
             cout << "Patents remaining: ";
-            vector<Card> available = patents.getAvailable();
+            vector<Patent> available = patents.getAvailable();
             
-            vector<Card>::iterator itr = available.begin();
+            vector<Patent>::iterator itr = available.begin();
             for(; itr != available.end(); itr++)
-                cout << itr->letter << " ";
+                cout << itr->getLetter() << " ";
             cout << endl;
         }
         

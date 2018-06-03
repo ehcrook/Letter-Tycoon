@@ -14,7 +14,7 @@ string Hand::output()
 {
     string o;
     for(unsigned int i = 0; i < hand.size(); i++) {
-        o.push_back(hand[i].letter);
+        o.push_back(hand[i].getLetter());
         if(i < hand.size()-1) o.push_back(' ');
     }
     //o.pop_back();
@@ -23,7 +23,7 @@ string Hand::output()
 
 Card Hand::getCard(char letter) {
     for(unsigned int i = 0; i < hand.size(); i++) {
-        if (hand[i].letter==letter)
+        if (hand[i].getLetter()==letter)
             return hand[i];
     }
     throw letter;
@@ -32,6 +32,6 @@ Card Hand::getCard(char letter) {
 string Hand::getLetters() {
     string o;
     for(unsigned int i = 0; i < hand.size(); i++)
-        o.push_back(hand[i].letter);
+        o.push_back(hand[i].getLetter());
     return o;
 }

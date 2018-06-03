@@ -16,7 +16,7 @@
 
 using namespace std;
 
-string Computer::play(Hand hand, Hand shared) {
+string Computer::play(Hand hand, Hand shared, vector<Patent> patents) {
 
     string letters = hand.getLetters() + shared.getLetters();
     
@@ -52,7 +52,12 @@ string Computer::discard(Hand hand) {
     return hand.getLetters().substr(0,1);
 }
 
-Card Computer::buyPatent(vector<Card> patents) {
+char Computer::replace(Hand hand) {
+    hand.shuffle();
+    return hand.getLetters()[0];
+}
+
+Patent Computer::buyPatent(vector<Patent> patents) {
     return patents[0];
 }
 

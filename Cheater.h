@@ -9,7 +9,7 @@
 #ifndef Cheater_h
 #define Cheater_h
 
-#include "Card.h"
+#include "Patent.h"
 #include "Hand.h"
 #include "Computer.h"
 #include "Dictionary.h"
@@ -19,8 +19,8 @@
 class Cheater : public Computer {
 public:
     Cheater(Dictionary &d) : Computer(d) {}
-    string play(Hand hand, Hand shared);
-    Card buyPatent(vector<Card> patents);
+    string play(Hand hand, Hand shared, vector<Patent> patents);
+    Patent buyPatent(vector<Patent> patents);
 private:
     void modifyDictionary(string word);
 };

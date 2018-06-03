@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "Card.h"
+#include "Patent.h"
 #include "Player.h"
 #include "Patents.h"
 
@@ -28,25 +28,26 @@ void Patents::load(string filename) {
     while(file >> letter >> price >> freq)
     {
         Card card(letter, price);
-        patents[card] = nobody;
+        Patent patent(card);
+        patents[patent] = nobody;
     }
     
 }
 
 void Patents::output(iostream out) {
     
-    map<Card, Player*>::iterator itr = patents.begin();
+    map<Patent, Player*>::iterator itr = patents.begin();
     for(; itr != patents.end(); itr++) {
-        out << itr->first.letter << " is owned by " << (itr->second)->getName() << endl;
+        out << (itr->first).getLetter() << " is owned by " << (itr->second)->getName() << endl;
     }
     
 }
 
 Player Patents::getPatentHolder(char c) {
     
-    map<Card, Player*>::iterator itr = patents.begin();
+    map<Patent, Player*>::iterator itr = patents.begin();
     for(; itr != patents.end(); itr++) {
-        if(itr->first.letter == c) return *itr->second;
+        if(itr->first.getLetter() == c) return *itr->second;
     }
     
     Player nobody("nobody");
@@ -54,17 +55,17 @@ Player Patents::getPatentHolder(char c) {
 
 }
 
-bool Patents::isPatentHolder(Player p, char c) {
+bool Patents::isPatentHolder(Player& p, char c) {
     
     Player holder = getPatentHolder(c);
     return p.getName()==holder.getName();
     
 }
 
-vector<Card> Patents::getAvailable() {
+vector<Patent> Patents::getAvailable() {
     
-    map<Card, Player*>::iterator itr = patents.begin();
-    vector<Card> available;
+    map<Patent, Player*>::iterator itr = patents.begin();
+    vector<Patent> available;
     for(; itr != patents.end(); itr++) {
 #ifdef _DEBUG
         cout << itr->first.letter << " is owned by " << (itr->second)->getName() << endl;
@@ -76,47 +77,57 @@ vector<Card> Patents::getAvailable() {
 
 }
 
-void Patents::buyPatent(Player& player, Card patent) {
+void Patents::buyPatent(Player& player, Patent& patent) {
     
-    cout << "Player wants to buy " << patent.letter << endl;
+    cout << "Player wants to buy " << patent.getLetter() << endl;
     
-    map<Card, Player*>::iterator itr = patents.begin();
+    map<Patent, Player*>::iterator itr = patents.begin();
     for(; itr != patents.end(); itr++) {
-        if(itr->first.letter == patent.letter) {
+        if((itr->first==patent)) {
             if (itr->second==nobody) {
                 patents[itr->first] = &player;
-                player.remove_money(itr->first.price);
+                player.remove_money(itr->first.getPrice());
                 player.add_patents(itr->first);
                 return;
             }
         }
     }
     
-    throw patent.letter;
+    throw patent.getLetter();
     
 }
 
-vector<Card> Patents::getBuyable(string word, int money) {
+vector<Patent> Patents::getPatents(Player& player) {
     
-    vector<Card> buyable;
+    vector<Patent> playerPatents;
+    map<Patent, Player*>::iterator itr = patents.begin();
+    for(; itr != patents.end(); itr++) {
+        if ((itr->second)->getName()==player.getName()) playerPatents.push_back(itr->first);
+    }
+    return playerPatents;
+}
+
+vector<Patent> Patents::getBuyable(string word, int money) {
+    
+    vector<Patent> buyable;
     for (int i = 0; i<word.size(); i++) {
         char letter = word[i];
         Player owner = getPatentHolder(letter);
-        Card card = getCard(letter);
-        if(owner.getName()==nobody->getName() && money >= card.price) buyable.push_back(card);
+        Patent patent = getPatent(letter);
+        if(owner.getName()==nobody->getName() && money >= patent.getPrice()) buyable.push_back(patent);
     }
     
     return buyable;
     
 }
 
-Card Patents::getCard(char c) {
+Patent Patents::getPatent(char c) {
 
-    map<Card, Player*>::iterator itr = patents.begin();
+    map<Patent, Player*>::iterator itr = patents.begin();
     for(; itr != patents.end(); itr++) {
-        if(itr->first.letter == c) return itr->first;
+        if(itr->first.getLetter() == c) return itr->first;
     }
     
-    throw "No Card exists for letter";
+    throw "No Patent exists for letter";
 }
 

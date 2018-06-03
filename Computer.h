@@ -9,7 +9,9 @@
 #ifndef Computer_h
 #define Computer_h
 
-#include "Card.h"
+#include <vector>
+
+#include "Patent.h"
 #include "Hand.h"
 #include "Strategy.h"
 #include "Dictionary.h"
@@ -18,9 +20,10 @@ class Computer : public Strategy {
 public:
     Computer(Dictionary &d) : Strategy(d) {}
 //    string getName() { return Strategy::getName(); }
-    string play(Hand hand, Hand shared);
+    string play(Hand hand, Hand shared, vector<Patent> patents);
     string discard(Hand hand);
-    Card buyPatent(vector<Card> patents);    
+    char replace(Hand hand);
+    Patent buyPatent(vector<Patent> patents);
 private:
     string tryWords(string letters, int length, int attempts);
 

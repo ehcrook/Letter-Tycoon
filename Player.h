@@ -1,7 +1,7 @@
 #ifndef _Player_h_
 #define _Player_h_
 
-#include "Card.h"
+#include "Patent.h"
 #include "Hand.h"
 
 //#include <set>
@@ -41,9 +41,9 @@ public:
     
     int get_stocks() const { return stocks; }
     
-    void add_patents(const Card& c) {
-        patent_total = patent_total+c.price;
-        patents.push_back(c.letter);
+    void add_patents(Patent c) {
+        patent_total = patent_total+c.getPrice();
+        patents.push_back(c.getLetter());
     }
     
     int get_patent_total() const { return patent_total; }
@@ -53,12 +53,12 @@ public:
     bool operator<(const Player& a) const
     {
         return name < a.name;
-    };
+    }
     
     bool operator==(const Player& a) const
     {
         return name == a.name;
-    };
+    }
 
 private:
 //    Hand hand;

@@ -6,6 +6,6 @@
 //  Copyright © 2018 Stuart Crook. All rights reserved.
 //
 
-#include "Card.h"
+#include "Patent.h"
 
-static const Card PASS = Card('P', -100);
+

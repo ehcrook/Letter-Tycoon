@@ -11,6 +11,10 @@
 
 #include <set>
 #include <string>
+#include <vector>
+
+#include "Patent.h"
+#include "Score.h"
 
 using namespace std;
 
@@ -20,6 +24,7 @@ public:
     Dictionary(){}
     void load(string file);
     bool check(string word);
+    Score score(string word, vector<Patent> patents);
     int getSize() { return (int)dictionary.size(); }
     
 private:

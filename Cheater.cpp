@@ -15,10 +15,11 @@
 
 #include "Card.h"
 #include "Hand.h"
+#include "Patent.h"
 
 using namespace std;
 
-string Cheater::play(Hand hand, Hand shared) {
+string Cheater::play(Hand hand, Hand shared, vector<Patent> patents) {
     
     string word;
     int i = rand() % 10;
@@ -27,7 +28,7 @@ string Cheater::play(Hand hand, Hand shared) {
         word = hand.getLetters() + shared.getLetters();
         modifyDictionary(word);
     } else {
-        word = Computer::play(hand, shared);
+        word = Computer::play(hand, shared, patents);
     }
     return word;
 }
@@ -45,14 +46,14 @@ void Cheater::modifyDictionary(string word) {
     
 }
 
-Card Cheater::buyPatent(vector<Card> patents) {
+Patent Cheater::buyPatent(vector<Patent> patents) {
     int i = rand() % 10;
-    if (i==0) return Card('a',0);
-    else if (i==1) return Card('e',0);
-    else if (i==2) return Card('i',0);
-    else if (i==3) return Card('o',0);
-    else if (i==4) return Card('s',0);
-    else if (i==5) return Card('t',0);
+    if (i==0) return Patent(Card('a',0));
+    else if (i==1) return Patent(Card('e',0));
+    else if (i==2) return Patent(Card('i',0));
+    else if (i==3) return Patent(Card('o',0));
+    else if (i==4) return Patent(Card('s',0));
+    else if (i==5) return Patent(Card('t',0));
     return Computer::buyPatent(patents);
 }
 
