@@ -25,7 +25,7 @@ public:
     char replace(Hand hand);
     Patent buyPatent(vector<Patent> patents);
 private:
-    string tryWords(string letters, int length, int attempts);
+    string tryWords(string letters, int length, int attempts, vector<Patent> patents);
 
 };
 

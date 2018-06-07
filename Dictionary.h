@@ -24,10 +24,11 @@ public:
     Dictionary(){}
     void load(string file);
     bool check(string word);
-    Score score(string word, vector<Patent> patents);
+    vector<Score> score(string word, vector<Patent> patents);
     int getSize() { return (int)dictionary.size(); }
     
 private:
+    Score getWordScore(string word, vector<Patent> patents);
     set<string> dictionary;
 };
 

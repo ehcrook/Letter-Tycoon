@@ -31,7 +31,7 @@ public:
         return deck.getSize();
     }
     Hand getSharedDeck() { return shared; }
-    void checkWord(Player player, string word);
+    void checkLetters(Player player, string word);
     void discard(Player player, string letters);
     void replace(Player player, char letter);
     void play(Player player, string word);

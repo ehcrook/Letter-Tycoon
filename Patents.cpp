@@ -112,6 +112,7 @@ vector<Patent> Patents::getBuyable(string word, int money) {
     vector<Patent> buyable;
     for (int i = 0; i<word.size(); i++) {
         char letter = word[i];
+        if (letter==',') continue;
         Player owner = getPatentHolder(letter);
         Patent patent = getPatent(letter);
         if(owner.getName()==nobody->getName() && money >= patent.getPrice()) buyable.push_back(patent);

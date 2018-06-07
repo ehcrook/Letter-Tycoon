@@ -20,28 +20,46 @@ string Computer::play(Hand hand, Hand shared, vector<Patent> patents) {
 
     string letters = hand.getLetters() + shared.getLetters();
     
+    int bestScore = 0;
+    string bestWord = "D";
     for(int length=10; length != 2; length--) {
-        string word = tryWords(letters, length, 10000);
-        if (word!="D") return word;
+        string word = tryWords(letters, length, 10000, patents);
+        if (word!="D") {
+            Score score = dictionary.score(word, patents)[0];
+            if (score.getValue() > bestScore) {
+                bestScore = score.getValue();
+                bestWord = word;
+                cout << bestWord << "," << bestScore << endl;
+            }
+        }
+
     }
     
-    return "D";
+    return bestWord;
 }
 
-string Computer::tryWords(string letters, int length, int attempts) {
+string Computer::tryWords(string letters, int length, int attempts, vector<Patent> patents) {
     
     int i = 0;
     bool valid = false;
-    string word;
-    while (i<attempts && !valid) {
+    int bestScore = 0;
+    string bestWord = "";
+    while (i<attempts) {
         random_shuffle(letters.begin(), letters.end());
-        word = letters.substr(0,length);
-        //        cout << i << " " << word << " " << valid << endl;
-        valid = dictionary.check(word);
+        string word = letters.substr(0,length);
+        if (dictionary.check(word)) {
+            Score score = dictionary.score(word, patents)[0];
+            if (score.getValue() > bestScore) {
+                bestScore = score.getValue();
+                bestWord = word;
+                valid = true;
+                cout << bestWord << "," << bestScore << endl;
+            }
+        }
         i++;
     }
     
-    if (valid) return word;
+    if (valid) return bestWord;
     
     return "D";
     

@@ -69,7 +69,7 @@ void Cards::endTurn(Player player){
     
 }
 
-void Cards::checkWord(Player player, string word)
+void Cards::checkLetters(Player player, string word)
 {
     Hand hand = *hands[player];
 
@@ -92,14 +92,24 @@ void Cards::checkWord(Player player, string word)
     for(unsigned int i = 0; i < word.size(); i++)
         used[word[i]]++;
     
+    bool valid = true;
+    char letter = NULL;
     map<char, int>::iterator itr;
     map<char, int>::iterator itr2 = used.begin();
     for(; itr2 != used.end(); itr2++)
     {
         itr = all.find(itr2->first);
-        if(itr == all.end() || itr->second < itr2->second)
-            throw itr->first;
+        if(itr == all.end() || itr->second < itr2->second) {
+            valid = false;
+            letter = itr->first;
+        }
     }
+    
+    if (valid) return;
+    
+    // TODO: checks for use of special patents
+
+    throw to_string(letter);
     
 }
 
@@ -116,19 +126,16 @@ void Cards::play(Player player, string word)
     {
         try {
             Card card = hand->getCard(word[i]);
-            //cout << "Removing " << word[i] << " from players hand." << endl;
             hand->remove(card);
             deck.discard(card);
         }
         catch (char l) {
             Card card = shared.getCard(word[i]);
-            //cout << "Removing " << word[i] << " from shared deck." << endl;
             shared.remove(card);
             deck.discard(card);
         }
     }
     
-    //cout << "Shared Deck is " << shared.output() << endl;
 }
 
 void Cards::discard(Player player, string word)
