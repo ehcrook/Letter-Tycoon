@@ -12,24 +12,25 @@
 #include <map>
 
 #include "Player.h"
-#include "Card.h"
+#include "Patent.h"
 
 class Patents {
 public:
     Patents() {
-        patents = map<Card, Player*>();
+        patents = map<Patent, Player*>();
         nobody = new Player("nobody");
     };
     void load(string filename);
-    vector<Card> getAvailable();
-    Card getCard(char c);
-    void buyPatent(Player& player, Card patent);
+    vector<Patent> getAvailable();
+    Patent getPatent(char c);
+    void buyPatent(Player& player, Patent& patent);
     Player getPatentHolder(char c);
-    bool isPatentHolder(Player player, char c);
-    vector<Card> getBuyable(string word, int money);
+    bool isPatentHolder(Player& player, char c);
+    vector<Patent> getPatents(Player& player);
+    vector<Patent> getBuyable(string word, int money);
     void output(iostream out);
 private:
-    map<Card, Player*> patents;
+    map<Patent, Player*> patents;
     Player *nobody;
 };
 

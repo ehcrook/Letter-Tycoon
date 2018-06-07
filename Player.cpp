@@ -7,12 +7,6 @@
 //
 
 #include "Player.h"
-#include "Card.h"
-#include "Deck.h"
-
-#include <iostream>
-#include <set>
-#include <map>
 
 using namespace std;
 

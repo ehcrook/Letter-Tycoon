@@ -12,12 +12,12 @@
 
 #include "Strategy.h"
 #include "Human.h"
-#include "Card.h"
+#include "Patent.h"
 #include "Hand.h"
 
 using namespace std;
 
-string Human::play(Hand hand, Hand shared) {
+string Human::play(Hand hand, Hand shared, vector<Patent> patents) {
     string word;
     cin >> word;
     return word;
@@ -29,17 +29,23 @@ string Human::discard(Hand hand) {
     return discards;
 }
 
-Card Human::buyPatent(vector<Card> patents) {
+char Human::replace(Hand hand) {
+    string discards;
+    cin >> discards;
+    return discards[0];
+}
+
+Patent Human::buyPatent(vector<Patent> patents) {
     string discards;
     
     cin >> discards;
 
-    vector<Card>::iterator itr = patents.begin();
+    vector<Patent>::iterator itr = patents.begin();
     for(; itr!=patents.end(); itr++) {
-        if (itr->letter==discards[0]) return *itr;
+        if (itr->getLetter()==discards[0]) return *itr;
     }
     
-    return Card('P',0);
+    return Patent(Card('P',0));
 }
 
 

@@ -22,6 +22,7 @@ using namespace std;
 
 class Cards
 {
+
 public:
     Cards() {}
     void load(string filename);
@@ -32,10 +33,11 @@ public:
     Hand getSharedDeck() { return shared; }
     void checkWord(Player player, string word);
     void discard(Player player, string letters);
+    void replace(Player player, char letter);
     void play(Player player, string word);
     void endTurn(Player player);
     Hand getHand(Player player);
-//    Hand operator[] (const Player& player) const { return hands[player]; }
+
 private:
     Deck deck;
     Hand shared;
